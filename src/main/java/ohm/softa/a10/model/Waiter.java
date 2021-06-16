@@ -19,13 +19,13 @@ public class Waiter implements Runnable {
 
 	@Override
 	 public void run() {
-		synchronized (kitchenHatch) {
+
 			try {
-
-				while (kitchenHatch.getOrderCount() != kitchenHatch.getMaxDishes()) {
-
-					if (kitchenHatch.getDishesCount() == 0) kitchenHatch.wait();
-
+				int i = 0;
+				while (i != kitchenHatch.getMaxDishes()) {
+					synchronized (this.kitchenHatch) {
+						if (kitchenHatch.getDishesCount() == 0) kitchenHatch.wait();
+					}
 
 					System.out.println("woke up");
 
@@ -33,14 +33,17 @@ public class Waiter implements Runnable {
 					kitchenHatch.dequeueDish();
 
 					progressReporter.updateProgress();
-					kitchenHatch.notifyAll();
+					synchronized (this.kitchenHatch) {
+						kitchenHatch.notifyAll();
+					}
+					i++;
 				}
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
-
 
 		progressReporter.notifyWaiterLeaving();
+
 	}
 }

@@ -16,7 +16,7 @@ public class Cook implements Runnable {
 
 	@Override
 	public void run() {
-		synchronized (kitchenHatch) {
+
 
 			while (kitchenHatch.getOrderCount() != 0) {
 				try {
@@ -24,20 +24,21 @@ public class Cook implements Runnable {
 					Dish dish = new Dish(order.getMealName());
 
 					Thread.sleep(dish.getCookingTime());
-
-					if (kitchenHatch.getDishesCount() == kitchenHatch.getMaxDishes()) kitchenHatch.wait();
-
+					synchronized (this.kitchenHatch) {
+						if (kitchenHatch.getDishesCount() == kitchenHatch.getMaxDishes()) kitchenHatch.wait();
+					}
 
 					kitchenHatch.enqueueDish(dish);
-					kitchenHatch.notifyAll();
-
+					synchronized (this.kitchenHatch) {
+						kitchenHatch.notifyAll();
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 
 				progressReporter.updateProgress();
 			}
-		}
+
 		progressReporter.notifyCookLeaving();
 
 	}
