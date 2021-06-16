@@ -44,7 +44,7 @@ public class MainController implements Initializable {
 		//TODO assign an instance of your implementation of the KitchenHatch interface
 		Deque<Order> orders = new ArrayDeque<>();
 		for (int i = 0; i <ORDER_COUNT ; i++) {
-			orders.add(new Order("Meal" + i));
+			orders.add(new Order(nameGenerator.getRandomDish()));
 		}
 		this.kitchenHatch = new KitchenHatchImpl(KITCHEN_HATCH_SIZE, orders);
 		this.progressReporter = new ProgressReporter(kitchenHatch, COOKS_COUNT, WAITERS_COUNT, ORDER_COUNT, KITCHEN_HATCH_SIZE);
@@ -59,10 +59,10 @@ public class MainController implements Initializable {
 		cooksBusyIndicator.progressProperty().bind(this.progressReporter.cooksBusyProperty());
 
 		for (int i = 0; i < WAITERS_COUNT; i++) {
-			new Thread(new Waiter("waiter", this.kitchenHatch, this.progressReporter)).start();
+			new Thread(new Waiter(nameGenerator.generateName(), this.kitchenHatch, this.progressReporter)).start();
 		}
 		for (int i = 0; i < COOKS_COUNT; i++) {
-			new Thread(new Cook("cooker", this.kitchenHatch, this.progressReporter)).start();
+			new Thread(new Cook(nameGenerator.generateName(), this.kitchenHatch, this.progressReporter)).start();
 		}
 		/* TODO create the cooks and waiters, pass the kitchen hatch and the reporter instance and start them */
 	}

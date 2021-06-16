@@ -16,16 +16,27 @@ public class Cook implements Runnable {
 
 	@Override
 	public void run() {
-		while (kitchenHatch.getOrderCount() != 0) {
-			Order order = kitchenHatch.dequeueOrder();
-			Dish dish = new Dish(order.getMealName());
-			try {
-				Thread.sleep(dish.getCookingTime());
-				kitchenHatch.enqueueDish(dish);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		synchronized (kitchenHatch) {
+
+			while (kitchenHatch.getOrderCount() != 0) {
+				try {
+					Order order = kitchenHatch.dequeueOrder();
+					Dish dish = new Dish(order.getMealName());
+
+					Thread.sleep(dish.getCookingTime());
+
+					if (kitchenHatch.getDishesCount() == kitchenHatch.getMaxDishes()) kitchenHatch.wait();
+
+
+					kitchenHatch.enqueueDish(dish);
+					kitchenHatch.notifyAll();
+
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+				progressReporter.updateProgress();
 			}
-			progressReporter.updateProgress();
 		}
 		progressReporter.notifyCookLeaving();
 

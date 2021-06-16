@@ -10,15 +10,16 @@ import java.util.Queue;
 public class KitchenHatchImpl implements KitchenHatch{
 	Deque<Dish> dishes;
 	Deque<Order> orders;
-
+	int dishSize;
 	public KitchenHatchImpl(int maxMeals, Deque<Order> orders) {
 		this.orders = orders;
 		dishes = new ArrayDeque<>(maxMeals);
+		dishSize = maxMeals;
 	}
 
 	@Override
 	public int getMaxDishes() {
-		return dishes.size();
+		return dishSize;
 
 	}
 
@@ -40,7 +41,7 @@ public class KitchenHatchImpl implements KitchenHatch{
 
 	@Override
 	public void enqueueDish(Dish m) {
-		dishes.offer(m);
+		dishes.add(m);
 	}
 
 	@Override
